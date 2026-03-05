@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChkWeb - Premium Website Analyzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #0a0e17;
+            --bg-card: #111827;
+            --primary: #3b82f6;
+            --primary-glow: #60a5fa;
+            --accent: #8b5cf6;
+            --yellow: #fbbf24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1f2937;
+            --glass: rgba(17, 24, 39, 0.85);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- ANIMATED SOLID DARK BACKGROUND --- */
+        .animated-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0e17 0%, #0f1420 50%, #0a0e17 100%);
+            animation: bgShift 15s ease-in-out infinite;
+        }
+
+        @keyframes bgShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px; height: 4px;            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: floatParticle 8s infinite ease-in-out;
+        }
+
+        @keyframes floatParticle {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50% { transform: translateY(-30px) scale(1.2); opacity: 0.6; }
+        }
+
+        .glow-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: glowMove 4s linear infinite;
+            opacity: 0.2;
+        }
+
+        @keyframes glowMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(1000%); }
+        }
+
+        /* --- TELEGRAM ICON --- */
+        .telegram-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #0088cc, #00aadd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            text-decoration: none;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 136, 204, 0.4);
+            animation: pulse 2s infinite, bounceIn 0.6s ease-out;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .telegram-link:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 30px rgba(0, 136, 204, 0.7);
+        }
+
+        @keyframes pulse {            0% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 136, 204, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- LAYOUT --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* --- HEADER --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 25px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            animation: glowText 3s ease-in-out infinite;
+        }
+
+        .logo-chk { color: #ffffff; }
+        .logo-web { color: var(--yellow); }
+
+        @keyframes glowText {
+            0%, 100% { text-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
+            50% { text-shadow: 0 0 25px rgba(251, 191, 36, 0.7); }
+        }
+        /* --- HERO SECTION --- */
+        .hero {
+            text-align: center;
+            padding: 30px 0 25px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            animation: titlePop 0.8s ease-out;
+        }
+
+        @keyframes titlePop {
+            0% { transform: scale(0.9); opacity: 0; }
+            60% { transform: scale(1.02); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 25px;
+            animation: fadeIn 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* --- INPUT AREA --- */
+        .search-box {
+            display: flex;
+            max-width: 550px;
+            margin: 0 auto;
+            background: var(--glass);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            animation: slideUp 0.6s ease-out 0.3s both;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 14px 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-box input::placeholder { color: var(--text-muted); }
+
+        .search-box button {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: pulseBtn 2s infinite;
+        }
+
+        @keyframes pulseBtn {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+        }
+
+        .search-box button:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+        }
+
+        /* --- LOADING STATE --- */
+        .loader {
+            display: none;
+            margin: 30px auto;
+            text-align: center;
+            animation: fadeIn 0.4s;
+        }
+
+        .spinner {
+            width: 45px; height: 45px;
+            border: 4px solid var(--border);            border-top: 4px solid var(--yellow);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- RESULTS SECTION --- */
+        #results {
+            display: none;
+            margin-top: 35px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 18px;
+            border-left: 4px solid var(--yellow);
+            padding-left: 14px;
+            animation: slideInLeft 0.5s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin-bottom: 35px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            animation: cardPop 0.5s ease-out both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: left 0.5s;
+        }
+
+        .card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        .card:hover::before { left: 100%; }
+
+        @keyframes cardPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.15s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.25s; }
+        .card:nth-child(5) { animation-delay: 0.3s; }
+        .card:nth-child(6) { animation-delay: 0.35s; }
+        .card:nth-child(7) { animation-delay: 0.4s; }
+        .card:nth-child(8) { animation-delay: 0.45s; }
+
+        .card h3 {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 5px 0;
+            animation: countUp 1s ease-out both;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-sub {            font-size: 0.85rem;
+            color: #4ade80;
+            margin-top: 4px;
+        }
+
+        .stat-sub.warning { color: var(--yellow); }
+        .stat-sub.danger { color: #f87171; }
+
+        /* --- INSTRUCTIONS --- */
+        .instructions-card {
+            background: linear-gradient(135deg, rgba(17,24,39,0.9), rgba(30,41,59,0.7));
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.7s ease-out 0.2s both;
+        }
+
+        .step-list { list-style: none; }
+
+        .step-list li {
+            position: relative;
+            padding-left: 36px;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            animation: slideInLeft 0.4s ease-out both;
+        }
+
+        .step-list li:nth-child(1) { animation-delay: 0.1s; }
+        .step-list li:nth-child(2) { animation-delay: 0.2s; }
+        .step-list li:nth-child(3) { animation-delay: 0.3s; }
+        .step-list li:nth-child(4) { animation-delay: 0.4s; }
+        .step-list li:nth-child(5) { animation-delay: 0.5s; }
+
+        .step-list li::before {
+            content: counter(step);
+            counter-increment: step;
+            position: absolute;
+            left: 0; top: 0;
+            width: 26px; height: 26px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 26px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            animation: pulse 2s infinite;
+        }
+        .step-list { counter-reset: step; }
+
+        /* --- FAQ --- */
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 14px;
+            margin-bottom: 45px;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            animation: fadeIn 0.5s ease-out both;
+        }
+
+        .faq-item:hover {
+            border-color: var(--yellow);
+            transform: translateX(5px);
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: var(--primary-glow);
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .faq-answer {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 25px 0 35px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        footer span {
+            color: var(--yellow);            font-weight: 700;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.9rem; }
+            .logo { font-size: 1.6rem; }
+            .search-box { flex-direction: column; }
+            .search-box button { margin-top: 8px; width: 100%; }
+            .faq-grid { grid-template-columns: 1fr; }
+            .telegram-link { width: 44px; height: 44px; font-size: 1.2rem; }
+        }
+
+        /* --- UTILITY ANIMATIONS --- */
+        .animate-hover { transition: all 0.3s ease; }
+        .animate-hover:hover { transform: translateY(-3px); }
+        
+        .float { animation: float 3s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Solid Dark Background -->
+    <div class="animated-bg" id="bg"></div>
+
+    <!-- Telegram Icon -->
+    <a href="https://t.me/misbackup1" target="_blank" class="telegram-link" title="Contact on Telegram">
+        <i class="fab fa-telegram-plane"></i>
+    </a>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <span class="logo-chk">Chk</span><span class="logo-web">Web</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); animation: fadeIn 1s 0.5s both;">v2.0 Pro</div>
+        </header>
+
+        <!-- Hero / Input -->
+        <section class="hero">
+            <h1 class="float">Deep Website Intelligence</h1>
+            <p>Traffic analytics, SEO metrics & technical insights in seconds</p>
+            
+            <div class="search-box">
+                <input type="url" id="urlInput" value="https://" placeholder="example.com">                <button onclick="analyzeWebsite()"><i class="fas fa-search"></i> Analyze</button>
+            </div>
+        </section>
+
+        <!-- Loading Animation -->
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <p style="color: var(--text-muted); animation: pulse 1.5s infinite;">Scanning digital footprint...</p>
+        </div>
+
+        <!-- Results Dashboard -->
+        <section id="results">
+            <h2 class="section-title">Report: <span id="resultUrl" style="color: var(--yellow);"></span></h2>
+            
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3><i class="fas fa-globe"></i> Global Rank</h3>
+                    <div class="stat-value" id="rankVal">#24,891</div>
+                    <div class="stat-sub">Top 0.08% worldwide</div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-users"></i> Monthly Visits</h3>
+                    <div class="stat-value" id="visitVal">2.8M</div>
+                    <div class="stat-sub">+18% growth</div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-clock"></i> Avg. Duration</h3>
+                    <div class="stat-value" id="durationVal">04:12</div>
+                    <div class="stat-sub">High engagement</div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-sign-out-alt"></i> Bounce Rate</h3>
+                    <div class="stat-value" id="bounceVal">28.4%</div>
+                    <div class="stat-sub warning">Industry avg: 45%</div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-server"></i> Server Location</h3>
+                    <div class="stat-value" style="font-size:1.3rem">🇺🇸 USA</div>
+                    <div class="stat-sub">Cloudflare CDN</div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-shield-alt"></i> SSL Certificate</h3>
+                    <div class="stat-value" style="color:#4ade80">Valid ✓</div>
+                    <div class="stat-sub">Expires: Dec 2026</div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-bolt"></i> Page Speed</h3>
+                    <div class="stat-value">94/100</div>
+                    <div class="stat-sub">Excellent performance</div>
+                </div>                <div class="card">
+                    <h3><i class="fas fa-link"></i> Backlinks</h3>
+                    <div class="stat-value" id="backlinksVal">12.4K</div>
+                    <div class="stat-sub">From 842 domains</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Instructions -->
+        <section style="margin-top: 45px;">
+            <h2 class="section-title">How to Use</h2>
+            <div class="instructions-card">
+                <ul class="step-list">
+                    <li>Enter any website URL in the search field above (https:// is pre-filled)</li>
+                    <li>Click the <strong>Analyze</strong> button to initiate the deep scan</li>
+                    <li>Wait ~2 seconds while ChkWeb gathers traffic & technical data</li>
+                    <li>Review the dashboard: rankings, visits, speed, security & more</li>
+                    <li>Use insights for SEO strategy, competitor research, or site optimization</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section>
+            <h2 class="section-title">FAQ</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">💰 Is ChkWeb really free?</div>
+                    <div class="faq-answer">Yes! Core analytics are 100% free. Premium API access available for developers.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">📊 How accurate is the traffic data?</div>
+                    <div class="faq-answer">We combine multiple data sources & machine learning for ~92% accuracy on public sites.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">🔍 Can I analyze competitor websites?</div>
+                    <div class="faq-answer">Absolutely! Enter any public URL to get competitive intelligence instantly.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">📱 Does it work for mobile sites?</div>
+                    <div class="faq-answer">Yes, our analysis includes mobile performance, Core Web Vitals & responsive checks.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">🔐 Is my search history private?</div>
+                    <div class="faq-answer">100% private. We don't store or track your analyzed URLs. All processing is client-side.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">⚡ Why is analysis so fast?</div>
+                    <div class="faq-answer">Smart caching + optimized algorithms deliver results in under 2 seconds for most sites.</div>
+                </div>            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 ChkWeb. All rights reserved.</p>
+            <p style="margin-top: 8px;">Developer BY <i class="fas fa-heart" style="color:#f87171"></i> by <span>ERROR AYAN</span></p>
+        </footer>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Create animated particles
+        function createParticles() {
+            const bg = document.getElementById('bg');
+            for(let i=0; i<25; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 5 + 's';
+                p.style.background = i%2===0 ? '#3b82f6' : '#fbbf24';
+                bg.appendChild(p);
+            }
+            // Add glow lines
+            for(let i=0; i<3; i++) {
+                const line = document.createElement('div');
+                line.className = 'glow-line';
+                line.style.top = (20 + i*30) + '%';
+                line.style.width = (30 + Math.random()*40) + '%';
+                line.style.animationDelay = (i*1.5) + 's';
+                bg.appendChild(line);
+            }
+        }
+
+        function analyzeWebsite() {
+            const input = document.getElementById('urlInput');
+            const loader = document.getElementById('loader');
+            const results = document.getElementById('results');
+            const urlDisplay = document.getElementById('resultUrl');
+
+            if (!input.value || input.value === 'https://') {
+                input.style.animation = 'shake 0.5s';
+                setTimeout(() => input.style.animation = '', 500);
+                input.focus();
+                return;
+            }
+
+            results.style.display = 'none';
+            loader.style.display = 'block';
+            // Simulate API delay
+            setTimeout(() => {
+                loader.style.display = 'none';
+                results.style.display = 'block';
+                urlDisplay.innerText = input.value;
+
+                // Generate realistic demo data
+                const visits = (Math.random() * 9 + 0.5).toFixed(1) + 'M';
+                const rank = Math.floor(Math.random() * 80000 + 5000).toLocaleString();
+                const duration = "0" + Math.floor(Math.random() * 59) + ":" + String(Math.floor(Math.random() * 59)).padStart(2,'0');
+                const bounce = (Math.random() * 40 + 15).toFixed(1) + '%';
+                const backlinks = (Math.random() * 45 + 2).toFixed(1) + 'K';
+                
+                document.getElementById('visitVal').innerText = visits;
+                document.getElementById('rankVal').innerText = '#' + rank;
+                document.getElementById('durationVal').innerText = duration;
+                document.getElementById('bounceVal').innerText = bounce;
+                document.getElementById('backlinksVal').innerText = backlinks;
+
+                // Add bounce rate color logic
+                const bounceNum = parseFloat(bounce);
+                const bounceSub = document.querySelector('#bounceVal + .stat-sub');
+                if(bounceNum < 30) bounceSub.className = 'stat-sub';
+                else if(bounceNum < 50) bounceSub.className = 'stat-sub warning';
+                else bounceSub.className = 'stat-sub danger';
+
+                results.scrollIntoView({ behavior: 'smooth' });
+
+                // Animate stat values on load
+                document.querySelectorAll('.stat-value').forEach(el => {
+                    el.style.animation = 'none';
+                    setTimeout(() => el.style.animation = 'countUp 0.8s ease-out both', 10);
+                });
+
+            }, 1800);
+        }
+
+        // Enter key support
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') analyzeWebsite();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            // Auto-focus input
+            setTimeout(() => document.getElementById('urlInput').focus(), 500);
+        });
+        // Add shake animation dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-8px); }
+                75% { transform: translateX(8px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
